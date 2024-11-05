@@ -4,6 +4,7 @@ print("Rayfield loaded successfully")
 local Player = game:GetService("Players").LocalPlayer
 local PlayerGUI = Player:WaitForChild("PlayerGui")
 local VirtualInputManager = game:GetService("VirtualInputManager")
+local currentPlayerList = {}
 
 local Window = Rayfield:CreateWindow({
     Name = "Fisch {🐟}",
@@ -210,29 +211,62 @@ end
 
 function UpdatePlayerList()
     print("UpdatePlayerList function called")
-    local playerList = {}
+    local newPlayerList = {}
     
     for _, player in pairs(game.Players:GetPlayers()) do
         if player ~= game.Players.LocalPlayer then
-            print("Adding player to list:", player.Name)
-            table.insert(playerList, player.Name)
+            table.insert(newPlayerList, player.Name)
         end
     end
     
-    print("Total players in list:", #playerList)
-    SelectPlayer:Refresh(playerList, true)
-    print("Player dropdown refreshed")
+    local hasChanges = false
+    if #currentPlayerList ~= #newPlayerList then
+        hasChanges = true
+    else
+        for i, name in ipairs(newPlayerList) do
+            if currentPlayerList[i] ~= name then
+                hasChanges = true
+                break
+            end
+        end
+    end
+    
+    if hasChanges then
+        currentPlayerList = newPlayerList
+        SelectPlayer:Refresh(newPlayerList, false)
+        print("Player dropdown updated with changes")
+    end
 end
-
 
 game.Players.PlayerAdded:Connect(function(player)
     print("New player joined:", player.Name)
-    UpdatePlayerList()
+    if player ~= game.Players.LocalPlayer then
+        table.insert(currentPlayerList, player.Name)
+        SelectPlayer:Refresh(currentPlayerList, false)
+        Rayfield:Notify({
+            Title = "Player Joined",
+            Content = player.Name .. " has joined the game!",
+            Duration = 3,
+            Image = 4483362458,
+        })
+    end
 end)
 
 game.Players.PlayerRemoving:Connect(function(player)
     print("Player leaving:", player.Name)
-    UpdatePlayerList()
+    for i, name in ipairs(currentPlayerList) do
+        if name == player.Name then
+            table.remove(currentPlayerList, i)
+            SelectPlayer:Refresh(currentPlayerList, false)
+            Rayfield:Notify({
+                Title = "Player Left",
+                Content = player.Name .. " has left the game!",
+                Duration = 3,
+                Image = 4483362458,
+            })
+            break
+        end
+    end
 end)
 
 UpdatePlayerList()
@@ -251,3 +285,4 @@ print("UI elements loaded")
 print("Event handlers connected")
 print("Memory management active")
 print("Performance monitoring enabled")
+print("und das geht schon von allein 🤣👌")
