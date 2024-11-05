@@ -236,8 +236,8 @@ game.Players.PlayerRemoving:Connect(function(player)
 end)
 
 UpdatePlayerList()
-print("Initial player list updated")6
-print("Script initialization complete")z
+print("Initial player list updated")
+print("Script initialization complete")
 print("finn hat geforzt")
 print("Security checks complete")
 print("All systems operational")
