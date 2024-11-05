@@ -27,7 +27,7 @@ local SelectPlayer = Gifting:CreateDropdown({
     Options = {},
     MultipleOptions = false,
     Callback = function(Value)
-        selectedPlayer = Value
+        selectedPlayer = type(Value) == "table" and Value[1] or Value
         print("Player selected:", Value)
     end,
 })
@@ -236,8 +236,8 @@ game.Players.PlayerRemoving:Connect(function(player)
 end)
 
 UpdatePlayerList()
-print("Initial player list updated")6
-print("Script initialization complete")z
+print("Initial player list updated")
+print("Script initialization complete")
 print("finn hat geforzt")
 print("Security checks complete")
 print("All systems operational")
