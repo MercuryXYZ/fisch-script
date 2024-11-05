@@ -90,42 +90,42 @@ function startAutoConfirm()
         if getgenv().autoconfirm and child:IsA("Frame") and child.Name == "offer" then
             local confirmButton = child:FindFirstChild("confirm")
             local shouldStop = false
-            
+           
             child.AncestryChanged:Connect(function(_, parent)
                 if not parent then
-                    print("Frame 'offer' wurde entfernt.")
+                    print("Frame 'offer' was removed.")
                     shouldStop = true
                 end
             end)
-            
+           
             if confirmButton then
                 confirmButton.AncestryChanged:Connect(function(_, parent)
                     if not parent then
-                        print("Bestätigungsbutton wurde entfernt.")
+                        print("Confirm button was removed.")
                         shouldStop = true
                     end
                 end)
-                
+               
                 while not shouldStop and getgenv().autoconfirm do
                     if confirmButton.Visible then
                         local pos = confirmButton.AbsolutePosition
                         local size = confirmButton.AbsoluteSize
-                        
+                       
                         local adjustedX = pos.X + size.X / 2
                         local adjustedY = pos.Y + size.Y / 2 + 58
-                        
-                        print("Bestätigungsbutton Position: ", adjustedX, adjustedY)
-                        print("Bestätigungsbutton Größe: ", size.X, size.Y)
-                        
+                       
+                        print("Confirm button position: ", adjustedX, adjustedY)
+                        print("Confirm button size: ", size.X, size.Y)
+                       
                         VirtualInputManager:SendMouseButtonEvent(adjustedX, adjustedY, 0, true, Player, 0)
                         VirtualInputManager:SendMouseButtonEvent(adjustedX, adjustedY, 0, false, Player, 0)
                     else
-                        print("Bestätigungsbutton ist nicht sichtbar.")
+                        print("Confirm button is not visible.")
                     end
                     task.wait(0.01)
                 end
             else
-                print("Bestätigungsbutton nicht gefunden.")
+                print("Confirm button not found.")
             end
         end
     end)
