@@ -199,7 +199,7 @@ Tabs.Main:AddSlider("ReelDelay", {
 
 --legit Reel
 
-Tabs.Main:AddToggle("LegitAutoReel",{
+Tabs.Main:AddToggle("LegitAutoReel", {
     Title = "Legit Auto Reel",
     Default = false,
     Callback = function(Value)
