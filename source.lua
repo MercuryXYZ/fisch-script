@@ -9,6 +9,7 @@ local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 local PlayerGUI = Player:WaitForChild("PlayerGui")
 local VirtualInputManager = game:GetService("VirtualInputManager")
+local GuiService = game:GetService("GuiService")
 
 -- UI Loading
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
@@ -17,6 +18,9 @@ local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/
 local selectedPlayer = ""
 local currentPlayerList = {}
 local Options = {}
+local autoShake = false
+local shakeConnection = nil
+local autoShakeDelay = 0.05
 
 -- Window Setup
 local Window = Fluent:CreateWindow({
@@ -38,6 +42,58 @@ local Tabs = {
     Gifting = Window:AddTab({ Title = "Gifting", Icon = "gift" })
 }
 
+-- Auto Shake Function
+local function handleButtonClick(button)
+    if not button.Visible then return end
+    
+    GuiService.SelectedObject = button
+    task.wait(autoShakeDelay)
+    
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+end
+
+-- Main Tab Elements
+local autoShakeToggle = Tabs.Main:AddToggle("AutoShake", {
+    Title = "Auto Shake",
+    Default = false,
+    Callback = function(Value)
+        autoShake = Value
+        
+        if Value then
+            PlayerGUI.ChildAdded:Connect(function(GUI)
+                if GUI:IsA("ScreenGui") and GUI.Name == "shakeui" then
+                    local safezone = GUI:WaitForChild("safezone", 5)
+                    if safezone then
+                        safezone.ChildAdded:Connect(function(child)
+                            if child:IsA("ImageButton") and child.Name == "button" then
+                                task.spawn(function()
+                                    if autoShake then
+                                        handleButtonClick(child)
+                                    end
+                                end)
+                            end
+                        end)
+                    end
+                end
+            end)
+        end
+    end
+})
+
+Tabs.Main:AddSlider("ShakeDelay", {
+    Title = "Auto Shake Delay",
+    Default = 0.05,
+    Min = 0.01,
+    Max = 2,
+    Rounding = 2,
+    Decimals = 2,
+    Description = "Adjust the delay between shakes",
+    Callback = function(Value)
+        autoShakeDelay = Value
+    end
+})
+
 -- Functions
 local function UpdatePlayerList()
     local newPlayerList = {}
@@ -51,6 +107,14 @@ local function UpdatePlayerList()
         Options.PlayerSelect:SetValues(newPlayerList)
     end
 end
+
+--ist jetzt nicht die beste lösung aber ich bin dran
+task.spawn(function()
+    task.wait(0.1)
+    autoShakeToggle.SetValue(true) -- Toggle it on
+    task.wait(0.05)
+    autoShakeToggle.SetValue(false) -- Toggle it off
+end)
 
 local function TradeEquipped()
     if selectedPlayer == "" then
@@ -137,7 +201,7 @@ local function startAutoConfirm()
     end)
 end
 
--- UI Elements
+-- Gifting Tab Elements
 Options.PlayerSelect = Tabs.Gifting:AddDropdown("PlayerSelect", {
     Title = "Select Player",
     Values = {},
@@ -207,7 +271,6 @@ Players.PlayerRemoving:Connect(function(player)
         end
     end
 end)
-
 
 -- Initial Setup
 UpdatePlayerList()
