@@ -21,6 +21,8 @@ local Options = {}
 local autoShake = false
 local shakeConnection = nil
 local autoShakeDelay = 0.05
+local autoReel = false
+local autoReelDelay = 2
 
 -- Window Setup
 local Window = Fluent:CreateWindow({
@@ -33,7 +35,8 @@ local Window = Fluent:CreateWindow({
     MinimizeConfig = {
         Side = "Left",
         Position = UDim2.new(0, 0, 0.5, 0)
-    }
+    },
+    MinimizeKey = Enum.KeyCode.LeftControl
 })
 
 -- Tabs
@@ -41,6 +44,8 @@ local Tabs = {
     Main = Window:AddTab({ Title = "Main", Icon = "home" }),
     Gifting = Window:AddTab({ Title = "Gifting", Icon = "gift" })
 }
+
+Window:SelectTab(Tabs.Main)
 
 -- Auto Shake Function
 local function handleButtonClick(button)
@@ -81,6 +86,21 @@ local autoShakeToggle = Tabs.Main:AddToggle("AutoShake", {
     end
 })
 
+--ist jetzt nicht die beste lösung aber ich bin dran
+task.spawn(function()
+    task.wait(0.1)
+
+    local value = true
+    autoShakeToggle.SetValue(value) -- Toggle it on
+    print("AutoShake set to " .. tostring(value))
+
+    task.wait(0.05)
+
+    value = false
+    autoShakeToggle.SetValue(value) -- Toggle it off
+    print("AutoShake set to " .. tostring(value))
+end)
+
 Tabs.Main:AddSlider("ShakeDelay", {
     Title = "Auto Shake Delay",
     Default = 0.05,
@@ -91,6 +111,58 @@ Tabs.Main:AddSlider("ShakeDelay", {
     Description = "Adjust the delay between shakes",
     Callback = function(Value)
         autoShakeDelay = Value
+    end
+})
+
+--ist jetzt nicht die beste lösung aber ich bin dran
+task.spawn(function()
+    task.wait(0.1)
+
+    local value = true
+    autoShakeToggle.SetValue(value) -- Toggle it on
+    print("AutoShake set to " .. tostring(value))
+
+    task.wait(0.05)
+
+    value = false
+    autoShakeToggle.SetValue(value) -- Toggle it off
+    print("AutoShake set to " .. tostring(value))
+end)
+
+Tabs.Main:AddToggle("AutoReel", {
+    Title = "Auto Reel",
+    Default = false,
+    Callback = function(Value)
+        autoReel = Value
+        
+        if Value then
+            PlayerGUI.ChildAdded:Connect(function(GUI)
+                if GUI:IsA("ScreenGui") and GUI.Name == "reel" then
+                    if autoReel then
+                        local reelEvent = ReplicatedStorage:WaitForChild("events"):WaitForChild("reelfinished")
+                        if reelEvent then
+                            repeat
+                                task.wait(autoReelDelay)
+                                reelEvent:FireServer(100, false)
+                            until GUI == nil or not autoReel
+                        end
+                    end
+                end
+            end)
+        end
+    end
+})
+
+Tabs.Main:AddSlider("ReelDelay", {
+    Title = "Auto Reel Delay",
+    Default = 2,
+    Min = 0,
+    Max = 5,
+    Rounding = 1,
+    Decimals = 1,
+    Description = "Adjust the delay between reels",
+    Callback = function(Value)
+        autoReelDelay = Value
     end
 })
 
@@ -107,14 +179,6 @@ local function UpdatePlayerList()
         Options.PlayerSelect:SetValues(newPlayerList)
     end
 end
-
---ist jetzt nicht die beste lösung aber ich bin dran
-task.spawn(function()
-    task.wait(0.1)
-    autoShakeToggle.SetValue(true) -- Toggle it on
-    task.wait(0.05)
-    autoShakeToggle.SetValue(false) -- Toggle it off
-end)
 
 local function TradeEquipped()
     if selectedPlayer == "" then
