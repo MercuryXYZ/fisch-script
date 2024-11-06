@@ -57,7 +57,7 @@ local AutoReelConnection = nil
 -- Window Setup
 local Window = Fluent:CreateWindow({
     Title = "Fisch {🐟}",
-    SubTitle = "by mercuryxyz",
+    SubTitle = "by mercuryxyz and fxnnxyz",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
     Acrylic = false,
