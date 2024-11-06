@@ -37,6 +37,7 @@ local PlayerGUI = Player:WaitForChild("PlayerGui")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 -- UI Loading
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
@@ -50,6 +51,8 @@ local shakeConnection = nil
 local autoShakeDelay = 0.05
 local autoReel = false
 local autoReelDelay = 2
+local AutoReelEnabled = false
+local autoReelConnection = nil
 
 -- Window Setup
 local Window = Fluent:CreateWindow({
@@ -112,6 +115,7 @@ local autoShakeToggle = Tabs.Main:AddToggle("AutoShake", {
         end
     end
 })
+
 
 --ist jetzt nicht die beste lösung aber ich bin dran
 task.spawn(function()
@@ -192,6 +196,62 @@ Tabs.Main:AddSlider("ReelDelay", {
         autoReelDelay = Value
     end
 })
+
+--legit Reel
+
+Tabs.Main:AddToggle("LegitAutoReel",{
+    Title = "Legit Auto Reel",
+    Default = false,
+    Callback = function(Value)
+        AutoReelEnabled = Value
+        if Value then
+            AutoReelConnection = RunService.RenderStepped:Connect(function()
+                local reel = PlayerGUI:FindFirstChild("reel")
+                if not reel then return end
+
+                local bar = reel:FindFirstChild("bar")
+                local playerbar = bar and bar:FindFirstChild("playerbar")
+                local fish = bar and bar:FindFirstChild("fish")
+
+                if playerbar and fish then
+                    playerbar.Position = fish.Position
+                end
+            end)
+        else
+            if autoReelConnection then
+                autoReelConnection:Disconnect()
+                autoReelConnection = nil
+            end
+        end
+    end
+})
+
+PlayerGUI.DescendantAdded:Connect(function(descendant)
+    if AutoReelEnabled and descendant.Name == "playerbar" and descendant.Parent and descendant.Parent.Name == "bar" then
+        if autoReelConnection then return end
+        AutoReelConnection = RunService.RenderStepped:Connect(function()
+            local reel = PlayerGUI:FindFirstChild("reel")
+            if not reel then return end
+
+            local bar = reel:FindFirstChild("bar")
+            local playerbar = bar and bar:FindFirstChild("playerbar")
+            local fish = bar and bar:FindFirstChild("fish")
+
+            if playerbar and fish then
+                playerbar.Position = fish.Position
+            end
+        end)
+    end   
+end)
+
+PlayerGUI.DescendantRemoving:Connect(function(descendant) 
+    if descendant.Name == "playerbar" and descendant.Parent and descendant.Parent.Name == "bar" then
+        if autoReelConnection then
+            autoReelConnection:Disconnect()
+            autoReelConnection = nil
+        end
+    end
+end)
 
 -- Functions
 local function UpdatePlayerList()
