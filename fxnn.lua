@@ -52,7 +52,7 @@ local autoShakeDelay = 0.05
 local autoReel = false
 local autoReelDelay = 2
 local AutoReelEnabled = false
-local autoReelConnection = nil
+local AutoReelConnection = nil
 
 -- Window Setup
 local Window = Fluent:CreateWindow({
@@ -218,9 +218,9 @@ Tabs.Main:AddToggle("LegitAutoReel", {
                 end
             end)
         else
-            if autoReelConnection then
-                autoReelConnection:Disconnect()
-                autoReelConnection = nil
+            if AutoReelConnection then
+                AutoReelConnection:Disconnect()
+                AutoReelConnection = nil
             end
         end
     end
@@ -228,7 +228,7 @@ Tabs.Main:AddToggle("LegitAutoReel", {
 
 PlayerGUI.DescendantAdded:Connect(function(descendant)
     if AutoReelEnabled and descendant.Name == "playerbar" and descendant.Parent and descendant.Parent.Name == "bar" then
-        if autoReelConnection then return end
+        if AutoReelConnection then return end
         AutoReelConnection = RunService.RenderStepped:Connect(function()
             local reel = PlayerGUI:FindFirstChild("reel")
             if not reel then return end
@@ -246,9 +246,9 @@ end)
 
 PlayerGUI.DescendantRemoving:Connect(function(descendant) 
     if descendant.Name == "playerbar" and descendant.Parent and descendant.Parent.Name == "bar" then
-        if autoReelConnection then
-            autoReelConnection:Disconnect()
-            autoReelConnection = nil
+        if AutoReelConnection then
+            AutoReelConnection:Disconnect()
+            AutoReelConnection = nil
         end
     end
 end)
