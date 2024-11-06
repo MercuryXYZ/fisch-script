@@ -10,6 +10,7 @@ local Player = Players.LocalPlayer
 local PlayerGUI = Player:WaitForChild("PlayerGui")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local GuiService = game:GetService("GuiService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- UI Loading
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
