@@ -4,6 +4,32 @@ repeat wait() until game.Players.LocalPlayer.Character
 repeat wait() until game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
 repeat wait() until game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 
+-- Destroy existing UI instances
+if _G.UIDestroy then
+    _G.UIDestroy()
+end
+
+-- Create cleanup function
+_G.UIDestroy = function()
+    if Window then
+        Window:Destroy()
+    end
+    
+    -- Reset all values
+    selectedPlayer = ""
+    currentPlayerList = {}
+    Options = {}
+    autoShake = false
+    if shakeConnection then
+        shakeConnection:Disconnect()
+    end
+    autoShakeDelay = 0.05
+    autoReel = false
+    autoReelDelay = 2
+    getgenv().giftloop = false
+    getgenv().autoconfirm = false
+end
+
 -- Core Services
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
