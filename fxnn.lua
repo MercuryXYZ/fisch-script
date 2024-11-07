@@ -4,31 +4,29 @@ repeat wait() until game.Players.LocalPlayer.Character
 repeat wait() until game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
 repeat wait() until game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 
--- Destroy existing UI instances
-if _G.UIDestroy then
-    _G.UIDestroy()
-end
-
--- Create cleanup function
-_G.UIDestroy = function()
-    if Window then
-        Window:Destroy()
-    end
-    
-    -- Reset all values
-    selectedPlayer = ""
-    currentPlayerList = {}
-    Options = {}
+-- Check for existing UI and clean up
+if _G.FxnnUI then
+    _G.FxnnUI:Destroy()
     autoShake = false
+    autoReel = false
+    AutoReelEnabled = false
+    autoCastEnabled = false
+    getgenv().giftloop = false
+    getgenv().autoconfirm = false
+    
     if shakeConnection then
         shakeConnection:Disconnect()
     end
-    autoShakeDelay = 0.05
-    autoReel = false
-    autoReelDelay = 2
-    getgenv().giftloop = false
-    getgenv().autoconfirm = false
+    if AutoReelConnection then
+        AutoReelConnection:Disconnect()
+    end
+    if autoCastConnection then
+        autoCastConnection:Disconnect()
+    end
 end
+
+-- Store new UI instance
+_G.FxnnUI = Window
 
 -- Core Services
 local Players = game:GetService("Players")
@@ -77,6 +75,7 @@ local Window = Fluent:CreateWindow({
     },
     MinimizeKey = Enum.KeyCode.LeftControl
 })
+_G.FxnnUI = Window
 
 -- Tabs
 local Tabs = {
