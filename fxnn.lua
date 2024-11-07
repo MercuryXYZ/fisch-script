@@ -53,6 +53,8 @@ local autoReel = false
 local autoReelDelay = 2
 local AutoReelEnabled = false
 local AutoReelConnection = nil
+local autoCastEnabled = false
+local autoCastConnection = nil
 
 -- Window Setup
 local Window = Fluent:CreateWindow({
@@ -76,6 +78,57 @@ local Tabs = {
 }
 
 Window:SelectTab(Tabs.Main)
+
+-- Auto Cast Function
+Tabs.Main:AddToggle("AutoCast", {
+    Title = "Auto Cast",
+    Default = false,
+    Callback = function(Value)
+        autoCastEnabled = Value
+        
+        if autoCastConnection then
+            autoCastConnection:Disconnect()
+            autoCastConnection = nil
+        end
+        
+        if Value then
+            local function performCast()
+                if not autoCastEnabled then return end
+                local tool = Player.Character:FindFirstChildOfClass("Tool")
+                if tool then
+                    local castEvent = tool:FindFirstChild("events") and tool.events:FindFirstChild("cast")
+                    if castEvent then
+                        local Random2 = math.random(90, 99)
+                        castEvent:FireServer(Random2)
+                    end
+                end
+            end
+
+            Player.Character.ChildAdded:Connect(function(child)
+                if not autoCastEnabled then return end
+                if child:IsA("Tool") then
+                    task.wait(0.1)
+                    performCast()
+                end
+            end)
+            
+            ReplicatedStorage.events.reelfinished.OnClientEvent:Connect(function()
+                if not autoCastEnabled then return end
+                task.wait(0.1)
+                performCast()
+            end)
+            
+            RunService.Heartbeat:Connect(function()
+                if not autoCastEnabled then return end
+                local tool = Player.Character:FindFirstChildOfClass("Tool")
+                if tool and not tool:FindFirstChild("bobber") then
+                    task.wait(0.1)
+                    performCast()
+                end
+            end)
+        end
+    end
+})
 
 -- Auto Shake Function
 local function handleButtonClick(button)
