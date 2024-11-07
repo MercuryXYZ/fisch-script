@@ -38,6 +38,13 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local VirtualUser = game:GetService("VirtualUser")
+
+Player.Idled:Connect(function()
+    print("Idled, try to click...")
+    VirtualUser:ClickButton1(Vector2.new(0, 0))
+    print("clicked")
+end)
 
 -- UI Loading
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
