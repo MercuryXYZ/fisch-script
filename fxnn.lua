@@ -66,7 +66,7 @@ local autoCastConnection = nil
 -- Window Setup
 local Window = Fluent:CreateWindow({
     Title = "Fisch {🐟}",
-    SubTitle = "by mercuryxyz and fxnnxyz",
+    SubTitle = "by mercuryxyz & fxnnxyz",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
     Acrylic = false,
